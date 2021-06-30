@@ -1,3 +1,5 @@
+import ElectronStore from 'electron-store';
+
 interface About {
   description: string
   shortDescription: string
@@ -43,6 +45,7 @@ export interface ContextType {
   refresh: () => Promise<void>
   refreshLibrary: (checkUpdates?: boolean) => void
   refreshing: boolean
+  store: ElectronStore
   user: string
 }
 

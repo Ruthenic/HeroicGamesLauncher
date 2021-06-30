@@ -1,6 +1,10 @@
 import React from 'react'
 
 import { ContextType } from 'src/types'
+const Store = window.require('electron-store')
+const store = new Store({
+  cwd: 'store'
+})
 
 const initialContext: ContextType = {
   category: 'games',
@@ -19,6 +23,7 @@ const initialContext: ContextType = {
   refresh: () => Promise.resolve(),
   refreshLibrary: () => Promise.resolve(),
   refreshing: false,
+  store: {...store},
   user: ''
 }
 

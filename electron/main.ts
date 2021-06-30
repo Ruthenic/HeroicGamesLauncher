@@ -58,10 +58,17 @@ import {
 import { handleProtocol } from './protocol'
 import { listenStdout } from './logger'
 import { logError, logInfo, logWarning } from './logger'
+import Store from 'electron-store'
+
 const { showErrorBox, showMessageBox,showOpenDialog } = dialog
+
 const isWindows = platform() === 'win32'
 
 let mainWindow: BrowserWindow = null
+export const store = new Store({
+  cwd: 'store'
+})
+store.set({platform: platform()})
 
 function createWindow(): BrowserWindow {
   listenStdout().then((arr) => {
@@ -445,6 +452,7 @@ ipcMain.handle('requestSettings', async (event, appName) => {
   if (appName === 'default') {
     return GlobalConfig.get().config
   }
+  console.log('store', store.get('platform'))
   // We can't use .config since apparently its not loaded fast enough.
   return await GameConfig.get(appName).getSettings()
 })

@@ -1,7 +1,10 @@
 import { AppSettings, ContextType, GameInfo } from 'src/types';
 import { WineInstallation } from './../types';
 import { initElectronMocks } from 'src/test_helpers/mock/electron';
-
+const Store = window.require('electron-store')
+const store = new Store({
+  cwd: 'store'
+})
 // template class to define test types
 class TestType<Type> {
   private default: Type;
@@ -192,6 +195,7 @@ const test_context = new TestType<ContextType>({
   refresh: () => Promise.resolve(),
   refreshLibrary: () => Promise.resolve(),
   refreshing: false,
+  store: {...store},
   user: 'user'
 })
 

@@ -16,6 +16,13 @@ import { i18n } from 'i18next'
 import UpdateComponent from 'src/components/UI/UpdateComponent'
 
 import ContextProvider from './ContextProvider'
+import ElectronStore from 'electron-store'
+
+// Initialize store on Frontend
+const Store = window.require('electron-store')
+const store = new Store({
+  cwd: 'store'
+})
 
 const storage: Storage = window.localStorage
 const { ipcRenderer } = window.require('electron')
@@ -41,6 +48,7 @@ interface StateProps {
   libraryStatus: GameStatus[]
   platform: string
   refreshing: boolean
+  store: ElectronStore
   user: string
 }
 
@@ -57,6 +65,7 @@ export class GlobalState extends PureComponent<Props> {
     libraryStatus: [],
     platform: '',
     refreshing: false,
+    store,
     user: ''
   }
 
@@ -280,10 +289,7 @@ export class GlobalState extends PureComponent<Props> {
     })
 
     const platform = await getPlatform()
-    const category = storage.getItem('category') || 'games'
-    const filter = storage.getItem('filter') || 'all'
-    const layout = storage.getItem('layout') || 'grid'
-    const language = storage.getItem('language') || 'en'
+    const {category, filter, layout, language} = store.get('feSettings') || {}
 
     if (!gameUpdates.length){
       const storedGameUpdates = JSON.parse(storage.getItem('updates') || '[]')
@@ -302,9 +308,8 @@ export class GlobalState extends PureComponent<Props> {
   componentDidUpdate() {
     const { filter, gameUpdates, libraryStatus, layout, category } = this.state
 
-    storage.setItem('category', category)
-    storage.setItem('filter', filter)
-    storage.setItem('layout', layout)
+    store.set('feSettings', {category, filter, layout})
+
     storage.setItem('updates', JSON.stringify(gameUpdates))
     const pendingOps = libraryStatus.filter((game) => game.status !== 'playing')
       .length

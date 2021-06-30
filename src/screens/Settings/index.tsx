@@ -37,7 +37,7 @@ interface ElectronProps {
 }
 
 const { ipcRenderer } = window.require('electron') as ElectronProps
-const storage: Storage = window.localStorage
+
 interface RouteParams {
   appName: string
   type: string
@@ -52,7 +52,7 @@ interface LocationState {
 function Settings() {
   const { t, i18n } = useTranslation()
   const { state } = useLocation() as { state: LocationState }
-  const { platform } = useContext(ContextProvider)
+  const { platform, store } = useContext(ContextProvider)
   const isWin = platform === 'win32'
 
   const [wineVersion, setWineVersion] = useState({
@@ -68,7 +68,7 @@ function Settings() {
   const [maxWorkers, setMaxWorkers] = useState(0)
   const [egsPath, setEgsPath] = useState(egsLinkedPath)
   const [language, setLanguage] = useState(
-    () => storage.getItem('language') || 'en'
+    () => store.get('settings.default.language') as string || 'en'
   )
   const toggleAddDesktopShortcuts = useToggle()
   const toggleAddGamesToStartMenu = useToggle()
@@ -162,6 +162,8 @@ function Settings() {
       setSavesPath(config.savesPath || '')
       setMaxWorkers(config.maxWorkers ?? 2)
       setCustomWinePaths(config.customWinePaths || [])
+      console.log(store.get('platform'))
+      console.log(store.get(`settings.${appName}`))
 
       if (!isDefault) {
         const {
@@ -227,6 +229,7 @@ function Settings() {
 
   useEffect(() => {
     writeConfig([appName, settingsToSave])
+    store.set(`settings.${appName}`, settingsToSave)
   }, [GlobalSettings, GameSettings, appName])
 
   if (!title) {
